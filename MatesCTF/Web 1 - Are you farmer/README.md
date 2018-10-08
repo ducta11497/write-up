@@ -1,10 +1,13 @@
 ## ARE YOU FARMER?
-
-<img align="center" src="https://i.imgur.com/Lr7STAT.png">
+<p align="center">
+  <img src="https://i.imgur.com/Lr7STAT.png">
+</p>
 
 Vào web, việc đầu tiên mình làm là thử ngay SQL Injection. Thử với payload ```' or 1=1-- -``` thì đăng nhập thành công
 
-<img align="center" src="https://i.imgur.com/VN7VjGl.png">
+<p align="center">
+  <img src="https://i.imgur.com/VN7VjGl.png">
+</p>
 
 Sau khi đăng nhập thành công thì web không còn chức năng gì khác, không hiển thị thông tin gì trong database nên đoán rằng SQLi Blind.
 Captcha nhìn đơn giản, dễ dàng bypass bằng pytesseract.
@@ -16,4 +19,6 @@ Vậy kịch bản sẽ như sau:
 	
 Mình dùng binary search để giảm thời gian blind. Và cuối cùng là code ở đây: [solve.py](solve.py), các bạn tự edit payload để lấy ra flag nhé
 
-<img align="center" src="https://i.imgur.com/G9k3nXh.png">
+<p align="center">
+  <img src="https://i.imgur.com/G9k3nXh.png">
+</p>
