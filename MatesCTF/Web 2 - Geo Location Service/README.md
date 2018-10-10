@@ -7,7 +7,15 @@ Sau khi đăng nhập bằng username bất kì thì thấy có chức năng sau
   <img src="https://i.imgur.com/u2Nl712.png">
 </p>
 
-Thử nhập IP và captcha vào, chuyển qua burpsuite, thử request lên vài lần thì không thấy báo sai captcha, có thể session được map với captcha, vậy là có thể bypass
+Thử nhập IP và captcha vào, chuyển qua burpsuite, thử request lên vài lần thì không thấy báo sai captcha<br/>
+Decode flask cookie thử thì nhận được 1 đoạn JSON như sau: ```{"captcha":{" b":"YTA2NmJiNTEyZWQyY2VmOTBiNjE1OGMxMDhiYzkwYjg="},"username":"123"}```
+
+<p align="center">
+  <img src="https://i.imgur.com/yDhDs1u.png">
+</p>
+
+Ở đây dễ thấy captcha là 1 đoạn base64, decode base64 thì ra 1 đoạn MD5. Thử encode đoạn captcha plain text 2 lần thì chính là đoạn MD5 đã được decode.<br/>
+Chứng tỏ captcha đã được chứa ở trong cookie, vậy là có thể bypass được captcha.
 
 <p align="center">
   <img src="https://i.imgur.com/y1bkbOa.png">
@@ -53,5 +61,5 @@ Sau một lúc search các công cụ để xóa bớt chuỗi trên linux thì 
 Cuối cùng thì cat ra flag
 
 <p align="center">
-  <img src="https://i.imgur.com/3muexSj.png">
+  <img src="https://i.imgur.com/ImZgfgW.png">
 </p>

