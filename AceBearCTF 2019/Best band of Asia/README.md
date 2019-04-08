@@ -38,7 +38,7 @@ F12 lên xem request thì biết được website đang chạy Apache, vậy th�
 
 Nhìn vào đây thì thấy **controller_image.php** là 1 file khá quan trọng, mình lại dùng sqlmap get file này về để đọc tiếp<br/>
 Sau khi get về thì mình thấy có một số function cần lưu ý.<br/>
-Đầu tiên là function **detail**:
+Đầu tiên là function **detail:**
 <p align="center">
   <img src="https://i.imgur.com/vKE225a.png">
 </p>
@@ -48,7 +48,7 @@ Có thể thấy đây là đoạn code bị dính SQLi ở phía trên, không 
   <img src="https://i.imgur.com/fbSokIB.png">
 </p>
 Thế là mình có thể đọc được source code của website thông qua đoạn này không cần chờ sqlmap nữa.<br/>
-Tiếp theo là function **upload**:
+Tiếp theo là function **upload:**
 <p align="center">
   <img src="https://i.imgur.com/MQG1CXc.png">
 </p>
@@ -58,24 +58,24 @@ Tiếp theo là function **upload**:
 </p>
 File sau khi upload lên content của file hoàn toàn giữ nguyên còn file name sẽ bị rename thành đuôi jpg, vậy thì không thể up shell php ở đây được. Mình nghĩ chắc nó sẽ cần dùng đến sau nên tạm bỏ lại đấy.
 
-Cuối cùng là function **fetchImagePage**:
+Cuối cùng là function **fetchImagePage:**
 <p align="center">
   <img src="https://i.imgur.com/NdCYOiy.png">
 </p>
 Ở đây thì cũng chả có gì đặc sắc, chỉ có chỗ lưu ý là nó sẽ load tất cả src của thẻ img có trong url input vào và dùng function **@getimagesize** để check xem có phải ảnh hay không, nếu là ảnh thì in ra.<br/>
 Sau một hồi đọc code mỏi hết mắt hình mình nhận ra là flag không hề xuất hiện trong 1 file php nào cả. Nhiều khả năng là file flag là 1 file txt hay gì đó, muốn biết tên file thì chắc là phải RCE.<br/>
-Tiếp tục thì mình đọc file **controller_audio.php**.
+Tiếp tục thì mình đọc file **controller_audio.php.**
 <p align="center">
   <img src="https://i.imgur.com/lTYM6p8.png">
 </p>
-Ở đây có function **_destruct** nhìn có vẻ nguy hiểm, mình nghĩ ngay đến Object injection. Lại tiếp tục đọc code tiếp thì thấy có 2 file **application/image.php** và **application/audio.php** đều có function **save**. Và function **save** của **image.php** có khả năng có thể write shell được
+Ở đây có function **_destruct** nhìn có vẻ nguy hiểm, mình nghĩ ngay đến Object injection. Lại tiếp tục đọc code tiếp thì thấy có 2 file **application/image.php** và **application/audio.php** đều có function **save.** Và function **save** của **image.php** có khả năng có thể write shell được
 <p align="center">
   <img src="https://i.imgur.com/4DKDg2D.png">
 </p>
-Vậy là mình bắt đầu có ý tưởng là phải control được biến **$file** và biến **$data** của object **image**, sau đấy lại control biến **$default_audio** của **controller_audio** để gọi đến function **save** của **image**.<br/>
+Vậy là mình bắt đầu có ý tưởng là phải control được biến **$file** và biến **$data** của object **image,** sau đấy lại control biến **$default_audio** của **controller_audio** để gọi đến function **save** của **image.**<br/>
 Lúc này mình nghĩ ngay đến **phar unserialize** vì ở đây đã có chức năng upload rồi, lại còn là object injection thì nhiều khả năng là phar.<br/>
 Sau một hồi search về phar thì mình tìm được 1 bài như sau: https://srcincite.io/blog/2018/10/02/old-school-pwning-with-new-school-tricks-vanilla-forums-remote-code-execution.html<br/>
-Vector tấn công khá giống với bài mình đang làm, thế là mình chỉnh sửa code đôi chút để inject vào object **image** và **controller_audio**, cụ thể như sau:
+Vector tấn công khá giống với bài mình đang làm, thế là mình chỉnh sửa code đôi chút để inject vào object **image** và **controller_audio,** cụ thể như sau:
 <p align="center">
   <img src="https://i.imgur.com/tSRt8N7.png">
 </p>
@@ -92,7 +92,7 @@ Thế là mình list hết các file trong folder "/var/www/html/" và có kết
   <img src="https://i.imgur.com/O51PAeA.png">
 </p>
 
-Tà đà, cuối cùng cũng ra được tên file flag rồi, **286473nfdfy72634734_flagggflag**, giờ chỉ việc vào file này và lấy flag thôi
+Tà đà, cuối cùng cũng ra được tên file flag rồi, **286473nfdfy72634734_flagggflag,** giờ chỉ việc vào file này và lấy flag thôi
 <p align="center">
   <img src="https://i.imgur.com/r1ddOLa.png">
 </p>
