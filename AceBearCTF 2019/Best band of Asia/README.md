@@ -12,7 +12,7 @@ Cụ thể chức năng của từng mục như sau:<br/>
 	- Upload: Khi ấn vào thì chỉ hiện lên "Permission denied" và ảnh của idol nào đấy cũng xinh phết<br/>
 	- Audio: Để set default video trên trang web, set xong thì video sẽ hiện ở góc phải dưới trang web<br/>
 
-Đầu tiên sau khi nhìn qua 1 lượt tổng thể của trang web thì mình nghĩ ngay đến việc tấn công vào trang Fetch Image, có thể ở đây dính SSRF hoặc LFI.
+Đầu tiên sau khi nhìn qua 1 lượt tổng thể của trang web thì mình nghĩ ngay đến việc tấn công vào trang Fetch Image, có thể ở đây dính SSRF hoặc LFI.<br/>
 Thử scheme file và các php wrapper vào thì đều báo invalid url, chỉ có chấp nhận những URL hợp lệ với scheme là http hoặc https
 
 <p align="center">
@@ -30,14 +30,14 @@ Mình liền thử SQL injection ở parameter id thì thấy đúng là đoạn
   <img src="https://i.imgur.com/QiYecsu.png">
 </p>
 
-Act cool, đứng hình mất hơn 30 phút thì thằng em trong đội có ý kiến là thử đọc file hay ghi file xem có được không. Oke thử liền và công nhận là đọc được thật nhưng không ghi được.
+Act cool, đứng hình mất hơn 30 phút thì thằng em trong đội có ý kiến là thử đọc file hay ghi file xem có được không. Oke thử liền và công nhận là đọc được thật nhưng không ghi được.<br/>
 F12 lên xem request thì biết được website đang chạy Apache, vậy thì nhiều khả năng là web vẫn ở folder default. Đọc thử file "/var/www/html/index.php" và đọc được, từ đây là mình có thể đọc được source của web rồi.
 <p align="center">
   <img src="https://i.imgur.com/sw0omVS.png">
 </p>
 
-Nhìn vào đây thì thấy controller_image.php là 1 file khá quan trọng, mình lại dùng sqlmap get file này về để đọc tiếp
-Sau khi get về thì mình thấy có một số function cần lưu ý.
+Nhìn vào đây thì thấy controller_image.php là 1 file khá quan trọng, mình lại dùng sqlmap get file này về để đọc tiếp<br/>
+Sau khi get về thì mình thấy có một số function cần lưu ý.<br/>
 Đầu tiên là function detail:
 <p align="center">
   <img src="https://i.imgur.com/vKE225a.png">
@@ -47,8 +47,7 @@ Có thể thấy đây là đoạn code bị dính SQLi ở phía trên, không 
 <p align="center">
   <img src="https://i.imgur.com/fbSokIB.png">
 </p>
-Thế là mình có thể đọc được source code của website thông qua đoạn này không cần chờ sqlmap nữa.
-
+Thế là mình có thể đọc được source code của website thông qua đoạn này không cần chờ sqlmap nữa.<br/>
 Tiếp theo là function upload:
 <p align="center">
   <img src="https://i.imgur.com/MQG1CXc.png">
@@ -63,10 +62,8 @@ Cuối cùng là function fetchImagePage:
 <p align="center">
   <img src="https://i.imgur.com/NdCYOiy.png">
 </p>
-Ở đây thì cũng chả có gì đặc sắc, chỉ có chỗ lưu ý là nó sẽ load tất cả src của thẻ img có trong url input vào và dùng hàm @getimagesize để check xem có phải ảnh hay không, nếu là ảnh thì in ra.
-
-Sau một hồi đọc code mỏi hết mắt hình mình nhận ra là flag không hề xuất hiện trong 1 file php nào cả. Nhiều khả năng là file flag là 1 file txt hay gì đó, muốn biết tên file thì chắc là phải RCE.
-
+Ở đây thì cũng chả có gì đặc sắc, chỉ có chỗ lưu ý là nó sẽ load tất cả src của thẻ img có trong url input vào và dùng hàm @getimagesize để check xem có phải ảnh hay không, nếu là ảnh thì in ra.<br/>
+Sau một hồi đọc code mỏi hết mắt hình mình nhận ra là flag không hề xuất hiện trong 1 file php nào cả. Nhiều khả năng là file flag là 1 file txt hay gì đó, muốn biết tên file thì chắc là phải RCE.<br/>
 Tiếp tục thì mình đọc file controller_audio.php.
 <p align="center">
   <img src="https://i.imgur.com/lTYM6p8.png">
@@ -75,23 +72,21 @@ Tiếp tục thì mình đọc file controller_audio.php.
 <p align="center">
   <img src="https://i.imgur.com/4DKDg2D.png">
 </p>
-Vậy là mình bắt đầu có ý tưởng là phải control được biến $file và biến $data của object image, sau đấy lại control biến $default_audio của controller_audio để gọi đến hàm save của image.
-Lúc này mình nghĩ ngay đến phar unserialize vì ở đây đã có chức năng upload rồi, lại còn là object injection thì nhiều khả năng là phar.
-
-Sau một hồi search về phar thì mình tìm được 1 bài như sau: https://srcincite.io/blog/2018/10/02/old-school-pwning-with-new-school-tricks-vanilla-forums-remote-code-execution.html
+Vậy là mình bắt đầu có ý tưởng là phải control được biến $file và biến $data của object image, sau đấy lại control biến $default_audio của controller_audio để gọi đến hàm save của image.<br/>
+Lúc này mình nghĩ ngay đến phar unserialize vì ở đây đã có chức năng upload rồi, lại còn là object injection thì nhiều khả năng là phar.<br/>
+Sau một hồi search về phar thì mình tìm được 1 bài như sau: https://srcincite.io/blog/2018/10/02/old-school-pwning-with-new-school-tricks-vanilla-forums-remote-code-execution.html<br/>
 Vector tấn công khá giống với bài mình đang làm, thế là mình chỉnh sửa code đôi chút để inject vào object image và controller_audio, cụ thể như sau:
 <p align="center">
   <img src="https://i.imgur.com/tSRt8N7.png">
 </p>
-Ở đây chú ý đến biến $file và $data của object image mình hoàn toàn control được, sau đấy thì mình lại tiếp tục inject biến $default_audio của object controller_audio bằng chính object image mà mình tạo ở trên. Vậy là xong bước tạo phar, upload lên website. Giờ sẽ cần tìm đến một hàm nào đấy có thể gọi đến wrapper phar để unserialize object. Như trong bài viết mình đề cập trên thì người ta lợi dùng @getimagesize để gọi đến phar unserialize. Nhìn lại function fetchImagePage thì có function @getimagesize thật.
-Vậy là vector tấn công của mình sẽ như sau: Tạo file phar với object đã bị inject -> Upload file phar vừa tạo lên website qua chức năng upload -> Tạo 1 file html có tag img với src là payload wrapper phar -> Dùng fetch để get image trên trang html vừa tạo, từ đấy src sẽ được truyền vào @getimagesize và unserialize object.
-
+Ở đây chú ý đến biến $file và $data của object image mình hoàn toàn control được, sau đấy thì mình lại tiếp tục inject biến $default_audio của object controller_audio bằng chính object image mà mình tạo ở trên. Vậy là xong bước tạo phar, upload lên website. Giờ sẽ cần tìm đến một hàm nào đấy có thể gọi đến wrapper phar để unserialize object. Như trong bài viết mình đề cập trên thì người ta lợi dùng @getimagesize để gọi đến phar unserialize. Nhìn lại function fetchImagePage thì có function @getimagesize thật.<br/>
+Vậy là vector tấn công của mình sẽ như sau: Tạo file phar với object đã bị inject -> Upload file phar vừa tạo lên website qua chức năng upload -> Tạo 1 file html có tag img với src là payload wrapper phar -> Dùng fetch để get image trên trang html vừa tạo, từ đấy src sẽ được truyền vào @getimagesize và unserialize object.<br/>
 Boom, đúng là mình đã write shell được, nhưng nhìn vào phpinfo thì các hàm để chạy lệnh hệ thống đều đã bị disable.
 <p align="center">
   <img src="https://i.imgur.com/tSRt8N7.png">
 </p>
 
-Phải tìm các khác để list file trong folder. Search google thì tìm ra function scandir có thể list file được.
+Phải tìm các khác để list file trong folder. Search google thì tìm ra function scandir có thể list file được.<br/>
 Thế là mình list hết các file trong folder "/var/www/html/" và có kết quả như sau:
 <p align="center">
   <img src="https://i.imgur.com/O51PAeA.png">
@@ -102,5 +97,5 @@ Tà đà, cuối cùng cũng ra được tên file flag rồi, 286473nfdfy726347
   <img src="https://i.imgur.com/r1ddOLa.png">
 </p>
 
-Tổng kết lại bài này khá là hay, kết hợp giữa SQLi và phar unserialize.
+Tổng kết lại bài này khá là hay, kết hợp giữa SQLi và phar unserialize.<br/>
 Cảm ơn AceBear đã mang đến cho bọn mình một cuộc chơi khá là bổ ích, mong các bạn sẽ tổ chức thêm những giải chất lượng như thế này nữa.
